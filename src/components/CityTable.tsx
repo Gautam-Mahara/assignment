@@ -3,7 +3,7 @@ import axios from 'axios';
 import Autosuggest from 'react-autosuggest';
 import { useNavigate } from 'react-router-dom';
 import './table.css';
-import {Table} from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
 
 const CityTable: React.FC = () => {
   const [cities, setCities] = useState<any[]>([]);
@@ -14,12 +14,14 @@ const CityTable: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCities = async (Search:String) => {
+    const fetchCities = async (Search: String) => {
       try {
-        if(searchQuery.trim() !== '') {
+        if (searchQuery.trim() !== '') {
           Search = searchQuery;
         }
-        const response = await axios.get(`https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?where=name%20LIKE%20%27${Search}%25%27&limit=100`)
+        const response = await axios.get(
+          `https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/geonames-all-cities-with-a-population-1000/records?where=name%20LIKE%20%27${Search}%25%27&limit=100`
+        );
         if (response.data && response.data.results) {
           setCities(response.data.results);
           setLoading(false);
@@ -48,9 +50,9 @@ const CityTable: React.FC = () => {
   const getSuggestions = (value: string) => {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
-    return inputLength === 0 ? [] : cities.filter(city =>
-      city.name.toLowerCase().slice(0, inputLength) === inputValue
-    );
+    return inputLength === 0
+      ? []
+      : cities.filter((city) => city.name.toLowerCase().slice(0, inputLength) === inputValue);
   };
 
   const onSuggestionsFetchRequested = ({ value }: { value: string }) => {
@@ -68,26 +70,31 @@ const CityTable: React.FC = () => {
   const inputProps: Autosuggest.InputProps<any> = {
     placeholder: 'Search cities...',
     value: searchQuery,
-    onChange: handleSearchChange
+    onChange: handleSearchChange,
   };
+
   const handleClickC = (lon: number, lat: number) => () => {
     navigate(`/rooms/new?lon=${lon}&lat=${lat}`);
   };
-  
+
   return (
     <div className='container'>
-      <h1 className='header-style'>Cities Table</h1>
-      <Autosuggest 
-        suggestions={suggestions}
-        onSuggestionsFetchRequested={onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={onSuggestionsClearRequested}
-        getSuggestionValue={(suggestion: any) => suggestion.name}
-        renderSuggestion={(suggestion: any) => <div>{suggestion.name}</div>}
-        onSuggestionSelected={onSuggestionSelected}
-        inputProps={inputProps}
-      />
-      
-      <Table className='' striped bordered hover variant="dark" size="sm">
+      <div className='sec-2'>
+        <h1 className='header-style centre'>Cities Table</h1>
+        <div className='search-bar'>
+          <Autosuggest
+            suggestions={suggestions}
+            onSuggestionsFetchRequested={onSuggestionsFetchRequested}
+            onSuggestionsClearRequested={onSuggestionsClearRequested}
+            getSuggestionValue={(suggestion: any) => suggestion.name}
+            renderSuggestion={(suggestion: any) => <div>{suggestion.name}</div>}
+            onSuggestionSelected={onSuggestionSelected}
+            inputProps={inputProps}
+          />
+        </div>
+      </div>
+
+      <Table>
         <thead>
           <tr>
             <th>City Name</th>
@@ -95,10 +102,14 @@ const CityTable: React.FC = () => {
             <th>Timezone</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className='data'>
           {cities.map((city) => (
-            <tr key={city.geoname_id}  onClick={handleClickC(city.coordinates.lon,city.coordinates.lat)}>
-              <td><a href={`/rooms/new?lon=${city.coordinates.lon}&lat=${city.coordinates.lat}`}  rel="noreferrer" target="_blank">{city.name}</a></td>
+            <tr key={city.geoname_id} onClick={handleClickC(city.coordinates.lon, city.coordinates.lat)}>
+              <td>
+                <a href={`/rooms/new?lon=${city.coordinates.lon}&lat=${city.coordinates.lat}`} rel='noreferrer' target='_blank'>
+                  {city.name}
+                </a>
+              </td>
               <td>{city.cou_name_en}</td>
               <td>{city.timezone}</td>
             </tr>
